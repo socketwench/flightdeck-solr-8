@@ -19,6 +19,10 @@ There are several tags available for this container, each with different Solr an
 | 6.6.6 | 6.6, 6, latest | 8.x-3.x | *none* | yes |
 | 5.5.5 | 5.5, 5 | 7.x-1.x | 7.x-1.x | yes |
 
+### 4.x version
+
+There is a 4.x version included in the repo for legacy reasons. It does not use YAML configuration, nor is it suitable for production. 
+
 ## Configuration
 
 This container does not use environment variables for configuration. Instead, the `/config/flight-deck-solr.yml` file is used to handle all configuration.
