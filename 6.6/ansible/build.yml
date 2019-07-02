@@ -9,7 +9,7 @@
         state: present
         update_cache: yes
       loop:
-        - "openjdk7-jre"
+        - "openjdk8-jre"
         - "curl"
         - "tar"
         - "rsync"
