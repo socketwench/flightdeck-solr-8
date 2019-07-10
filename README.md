@@ -21,11 +21,11 @@ There are several tags available for this container, each with different Solr an
 
 ### 4.x version
 
-There is a 4.x version included in the repo for legacy reasons. It does not use YAML configuration, nor is it suitable for production. 
+There is a 4.x version included in the repo for legacy reasons. It does not use YAML configuration, nor is it suitable for production.
 
 ## Configuration
 
-This container does not use environment variables for configuration. Instead, the `/config/flight-deck-solr.yml` file is used to handle all configuration.
+This container does not use environment variables for configuration. Instead, the `flight-deck-solr.yml` file is used to handle all configuration.
 
 ```yaml
 ---
@@ -86,6 +86,28 @@ flightdeck_cluster:
         path: "/config"
 ```
 
+## Using with Docker Compose
+
+Create the `flight-deck-solr.yml` file relative to your `docker-compose.yml`. Define the `solr` service mounting the file as a volume:
+
+```yaml
+version: '3'
+services:
+  solr:
+    image: ten7/flight-deck-solr:6.6
+    volumes:
+      - ./flight-deck-solr.yml:/config/flight-deck-solr.yml
+    ports:
+      - "8003:8983"
+```
+
+## Part of Flight Deck
+
+This container is part of the [Flight Deck library](https://github.com/ten7/flight-deck) of containers for Drupal local development and production workloads on Docker, Swarm, and Kubernetes.
+
+Flight Deck is used and supported by [TEN7](https://ten7.com/).
+
+
 ## Debugging
 
 If you need to get verbose output from the entrypoint, set `flightdeck_debug` to `true` or `yes` in the config file.
@@ -95,13 +117,9 @@ If you need to get verbose output from the entrypoint, set `flightdeck_debug` to
 flightdeck_debug: yes
 ```
 
-If something has seriously gone wrong, can the container will not start due to a failure of the entrypoint, set the `FLIGHTDECK_SKIP_ENTRYPOINT` to `true` or `1`, then restart the container.
+This container uses [Ansible](https://www.ansible.com/) to perform start-up tasks. To get even more verbose output from the start up scripts, set the `ANSIBLE_VERBOSITY` environment variable to `4`.
 
-## Part of Flight Deck
-
-This container is part of the [Flight Deck library](https://github.com/ten7/flight-deck) of containers for Drupal local development and production workloads on Docker, Swarm, and Kubernetes.
-
-Flight Deck is used and supported by [TEN7](https://ten7.com/).
+If the container will not start due to a failure of the entrypoint, set the `FLIGHTDECK_SKIP_ENTRYPOINT` environment variable to `true` or `1`, then restart the container.
 
 ## License
 
