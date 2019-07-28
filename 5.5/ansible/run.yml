@@ -61,14 +61,15 @@
       when:
         - item.type | default(false) == 'apachesolr'
       loop: "{{ flightdeck_solr.cores | default([]) }}"
-    - name: Symlink custom core confs to /opt/solr/server/solr
-      file:
-        src: "{{ item.confDir }}"
+    - name: Sync custom core confs to /opt/solr/server/solr
+      synchronize:
+        src: "{{ item.confDir }}/"
         dest: "/opt/solr/server/solr/{{ item.name }}/conf"
-        state: link
-        owner: "solr"
-        group: "solr"
-        mode: "u=wrx,g=rwx,o="
+        archive: yes
+        delete: yes
+        owner: no
+        group: no
+        perms: no
       when:
         - item.type | default(false) == 'custom'
         - item.confDir is defined
