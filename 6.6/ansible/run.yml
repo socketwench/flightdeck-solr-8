@@ -21,7 +21,7 @@
       when:
         - item.type | default(true) != 'custom'
       loop: "{{ flightdeck_solr.cores | default([]) }}"
-    - name: Ensure non-custom core data directories exist in /data
+    - name: Ensure core data directories exist
       file:
         path: "{{ item.dataDir | default('/data/' + item.name) }}"
         state: directory
@@ -29,8 +29,6 @@
         group: "solr"
         mode: "u=wrx,g=rwx,o="
         recurse: true
-      when:
-        - item.type | default(true) != 'custom'
       loop: "{{ flightdeck_solr.cores | default([]) }}"
     - name: Symlink non-custom core data directores to /opt/solr/server/solr/
       file:
