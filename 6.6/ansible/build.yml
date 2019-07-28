@@ -68,23 +68,6 @@
         owner: "solr"
         group: "solr"
         mode: "u=rwx,g=rwx,o="
-    - name: Download search_api_solr
-      get_url:
-        url: "https://ftp.drupal.org/files/projects/search_api_solr-8.x-3.x-dev.tar.gz"
-        dest: "{{ _run_temp_dir.path }}/search_api_solr.tar.gz"
-        mode: "u=rwx,g=rwx,o="
-    - name: Expand archive
-      unarchive:
-        src: "{{ _run_temp_dir.path }}/search_api_solr.tar.gz"
-        dest: "{{ _run_temp_dir.path }}/search_api_solr"
-        owner: "solr"
-        group: "solr"
-        mode: "u=rwx,g=rwx,o=r"
-        extra_opts:
-          - "--strip-components=1"
-    - name: Move the search_api_conf directory to /opt
-      command: >
-        mv {{ _run_temp_dir.path }}/search_api_solr/solr-conf-templates/6.x /opt/search_api_conf
   handlers:
     - name: delete temp items
       file:

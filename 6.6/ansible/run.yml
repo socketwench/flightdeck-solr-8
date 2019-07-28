@@ -45,7 +45,7 @@
         - item.type | default(true) != 'custom'
     - name: Populate search_api_solr core confs
       synchronize:
-        src: "/opt/search_api_conf/"
+        src: "/ansible/templates/search_api_conf"
         dest: "/opt/solr/server/solr/{{ item.name }}/conf"
         archive: yes
         delete: yes
