@@ -9,7 +9,7 @@
         state: present
         update_cache: yes
       loop:
-        - "openjdk8-jre"
+        - "openjdk11-jre"
         - "curl"
         - "tar"
         - "rsync"
@@ -24,9 +24,9 @@
         - delete temp items
     - name: Download solr
       get_url:
-        url: "https://archive.apache.org/dist/lucene/solr/6.6.6/solr-6.6.6.tgz"
+        url: "https://archive.apache.org/dist/lucene/solr/8.6.0/solr-8.6.0.tgz"
         dest: "{{ _run_temp_dir.path }}/solr.tar.gz"
-        checksum: "sha1:1dfd3de06c8e6554c42e69f49573b563125da5a1"
+        checksum: "sha512:6b0d618069e37215f305d9a61a3e65be2b9cfc32a3689ea6a25be2f220b1ecc96a644ecc31c81e335a2dfa0bc8b7d0f2881ca192c36fd435cdd832fd309a9ddb"
         mode: "u=rwx,g=rwx,o="
     - name: Ensure key directories exist
       file:

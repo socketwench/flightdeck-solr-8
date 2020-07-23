@@ -41,15 +41,6 @@
       loop: "{{ flightdeck_solr.cores | default([]) }}"
       when:
         - item.type | default(true) != 'custom'
-    - name: Populate search_api_solr core confs
-      synchronize:
-        src: "/ansible/templates/search_api_conf"
-        dest: "/opt/solr/server/solr/{{ item.name }}/conf"
-        archive: yes
-        delete: yes
-      when:
-        - item.type | default(false) == 'search_api_solr'
-      loop: "{{ flightdeck_solr.cores | default([]) }}"
     - name: Sync custom core confs to /opt/solr/server/solr
       synchronize:
         src: "{{ item.confDir }}/"
