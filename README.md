@@ -11,18 +11,32 @@ Features:
 
 ## Tags and versions
 
-There are several tags available for this container, each with different Solr and module support:
+There are several tags available for this container, each with different Solr and Drupal module support:
 
-| Solr version | Tags | Search API | Apachesolr | Custom cores |
-| ------------ | ---- | ---------- | ---------- | ------------ |
-| 8.6.0 | 8.6, 8 | yes | no | yes |
-| 6.6.6 | 6.6, 6, latest | yes | no | yes |
-| 5.5.5 | 5.5, 5 | 7.x-1.x | 7.x-1.x | yes |
+| Tags | Solr Version | Search API | Custom cores |
+| ---- | ------------ | ---------- | ------------ |
+| latest | 8.6 | Yes | Yes |
+| x.y.z | 8.6 | Yes | Yes |
 
 
 ## Configuration
 
-This container does not use environment variables for configuration. Instead, the `flight-deck-solr.yml` file is used to handle all configuration.
+Instead of a large number of environment variables, this container relies on a file to perform all runtime configuration, `flightdeck-solr.yml`. Inside the file, create following:
+
+```yaml
+---
+flightdeck_solr: {}
+```
+
+All configuration is done as items under the `flightdeck_solr` variable. See the following sections for details as to particular configurations.
+
+You can provide this file in one of three ways to the container:
+
+* Mount the configuration file at path `/config/solr/flightdeck-solr.yml` inside the container using a bind mount, configmap, or secret.
+* Mount the config file anywhere in the container, and set the `FLIGHTDECK_CONFIG_FILE` environment variable to the path of the file.
+* Encode the contents of `flightdeck-solr.yml` as base64 and assign the result to the `FLIGHTDECK_CONFIG` environment variable.
+
+### Basic settings
 
 ```yaml
 ---
