@@ -13,6 +13,7 @@
         - "curl"
         - "tar"
         - "rsync"
+        - "lsof"
       notify:
         - clear apk cache
     - name: Create a temp directory to store files needed by the run
