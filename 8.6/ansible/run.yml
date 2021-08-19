@@ -68,12 +68,14 @@
       loop: "{{ flightdeck_solr.cores | default([]) }}"
     - name: Start local solr
       shell: >
-         /opt/solr/bin/solr start -m 512m -p 8983 -h localhost
+         /opt/solr/bin/solr start -m 512m -p 9000 -h localhost
+      environment:
+        SOLR_PID_DIR: "/home/solr"
       notify:
         - stop local solr
     - name: Wait for solr to be ready
       uri:
-        url: "http://localhost:8983"
+        url: "http://localhost:9000"
         return_content: yes
       register: _solr_ready
       until: "'solr' in _solr_ready.content | default('')"
@@ -81,7 +83,7 @@
       delay: 5
     - name: Get list of existing cores
       uri:
-        url: "http://localhost:8983/solr/admin/cores"
+        url: "http://localhost:9000/solr/admin/cores"
         return_content: yes
       register: _current_cores
     - name: Generate a flat list of core names
@@ -95,5 +97,7 @@
   handlers:
     - name: stop local solr
       shell: >
-        /opt/solr/bin/solr stop -p 8983 && pkill java
+        /opt/solr/bin/solr stop -all && pkill java
       ignore_errors: yes
+      environment:
+        SOLR_PID_DIR: "/home/solr"
