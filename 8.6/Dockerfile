@@ -1,4 +1,4 @@
-FROM alpine:3.12
+FROM alpine:3.14
 MAINTAINER tess@ten7.com
 
 # Update the package list and install Ansible.
@@ -23,9 +23,10 @@ RUN ansible-galaxy install -fr /ansible/requirements.yml && \
 VOLUME /data
 EXPOSE 8983
 
-# Switch to the service account.
+# Switch to the service account and set SOLR_PID_DIR
 USER solr
+ENV SOLR_PID_DIR /home/solr
 
 # Set the entrypoint and default command.
 ENTRYPOINT ["/usr/local/bin/docker-entrypoint.sh"]
-CMD ["/opt/solr/bin/solr", "-f"]
+CMD ["/opt/solr/bin/solr", "-f", "-m", "512m", "-p", "8983", "-h", "localhost"]
