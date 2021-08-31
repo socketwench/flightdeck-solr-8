@@ -59,17 +59,68 @@ flightdeck_solr:
   port: 8983
   cores:
     - name: "my_custom_core"
-      type: "custom"
       confDir: "/solr-conf"
       dataDir: "/solr-data"
+    - name: "my_other_core"
+      type: "custom"
+      confDir: "/other-conf"
+      dataDir: "/other-data"
 ```
 
 Each item has the following variables:
 
 * **name** is the name of the solr core. Required.
-* **type** is the type of Solr core to create. Required, must be `custom` or `empty`.
+* **type** is the type of Solr core to create. Optional, must be `custom` or `empty`.
 * **confDir** is the path inside the container at which the schema files are mounted. Required for `custom` cores.
 * **dataDir** is the path inside the container at which the core data is to be stored. Optional, defaults to `/data/&lt;name_of_the_core&gt;`.
+
+### Passing core configs inline
+
+In some cases, you may wish to pass your solr core configs inline inside of `flightdeck-solr.yml` rather than as a mounted directory in the container. In that case, you can define the `conf` list.
+
+Each item under the list represents a file in the core configuration directory:
+
+```yaml
+---
+flightdeck_solr:
+  port: 8983
+  cores:
+    - name: "my_custom_core"
+      type: "custom"
+      conf:
+        - name: "solrconfig.xml"
+          content: |
+            <?xml version="1.0" encoding="UTF-8" ?>
+
+            <!DOCTYPE config [
+              <!ENTITY extra SYSTEM "solrconfig_extra.xml">
+              <!ENTITY index SYSTEM "solrconfig_index.xml">
+            ]>
+```
+
+Where:
+
+* **name** is the name of the file to create.
+* **content** is the content of the file.
+
+### Encoding issues for inline conf
+
+A drawback of inline configuration is that you need to escape it work in YAML. This can be frustrating an difficult. Instead, is recommended to base64 encode the content of the file, and use the `content_base64` key instead:
+
+```yaml
+---
+flightdeck_solr:
+  port: 8983
+  cores:
+    - name: "my_custom_core"
+      type: "custom"
+      conf:
+        - name: "solrconfig.xml"
+          content_base64: |
+            PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiID8+Cgo8IURPQ1RZUEUgY29uZmln
+            IFsKICAgPCFFTlRJVFkgZXh0cmEgU1lTVEVNICJzb2xyY29uZmlnX2V4dHJhLnhtbCI+CiAgIDwh
+            RU5USVRZIGluZGV4IFNZU1RFTSAic29scmNvbmZpZ19pbmRleC54bWwiPgpdPgo=
+```
 
 ### What about Search API?
 
@@ -78,7 +129,7 @@ Flight Deck Solr supports Search API as fully custom cores. This is due to chang
 1. First, create an `empty` core using this container.
 2. Generate the config.zip in Drupal.
 3. Update your docker-compose.yml to mount the extracted *.zip at the path specified by `confDir`.
-4. Update your flight-deck-solr.yml to be a `custom` core `type`.
+4. Update your flightdeck-solr.yml to be a `custom` core `type`.
 5. Restart the solr container.
 
 ## Deployment on Kubernetes
@@ -91,7 +142,7 @@ flightdeck_cluster:
   configMaps:
     - name: "solr_config"
       files:
-        - name: "flight-deck-solr.yml"
+        - name: "flightdeck-solr.yml"
           content: |
             flightdeck_solr:
               cores:
@@ -105,7 +156,7 @@ flightdeck_cluster:
 
 ## Using with Docker Compose
 
-Create the `flight-deck-solr.yml` file relative to your `docker-compose.yml`. Define the `solr` service mounting the file as a volume:
+Create the `flightdeck-solr.yml` file relative to your `docker-compose.yml`. Define the `solr` service mounting the file as a volume:
 
 ```yaml
 version: '3'
@@ -113,7 +164,7 @@ services:
   solr:
     image: ten7/flight-deck-solr
     volumes:
-      - ./flight-deck-solr.yml:/config/solr/flight-deck-solr.yml
+      - ./flightdeck-solr.yml:/config/solr/flightdeck-solr.yml
     ports:
       - "8003:8983"
 ```
