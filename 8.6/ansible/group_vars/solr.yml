@@ -55,8 +55,8 @@ flightdeck_solr_defaults:
   port: "8983"
   memory: "512m"
   cores: []
+  cloud:
+    state: no
+    zookeepers: []
 
-flightdeck_solr:
-  port: "{{ flightdeck_solr_defaults.port }}"
-  memory: "{{ flightdeck_solr_defaults.memory }}"
-  cores: "{{ flightdeck_solr_defaults.cores }}"
+flightdeck_solr: "{{ flightdeck_solr_defaults }}"

@@ -1,0 +1,18 @@
+---
+- hosts: solr
+  tasks:
+    - name: Get list of existing cores
+      uri:
+        url: "http://localhost:{{ flightdeck_solr.port | default(flightdeck_solr_defaults.port) }}/solr/admin/cores"
+        return_content: yes
+      register: _current_cores
+
+    - name: Generate a flat list of core names
+      set_fact:
+        _wanted_cores: "{{ flightdeck_solr.cores | default([]) | map(attribute='name') | list }}"
+
+    - name: Create cores
+      command: >
+        /opt/solr/bin/solr create -c {{ item }}
+      when: item not in _current_cores.content
+      loop: "{{ _wanted_cores }}"

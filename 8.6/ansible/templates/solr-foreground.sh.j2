@@ -6,7 +6,10 @@ SCRIPT_NAME=`basename "$0"`
 echo "$SCRIPT_NAME: Starting solr in the foreground..."
 
 /opt/solr/bin/solr start -f \
-  {% if (flightdeck_debug | default(false) == true) or (lookup('env', 'ANSIBLE_VERBOSITY') | default(false, true)) %}-v{% endif %} \
+{% if (flightdeck_debug | default(false) == true) or (lookup('env', 'ANSIBLE_VERBOSITY') | default(false, true)) %}-v{% endif %} \
+{% if flightdeck_solr.cloud.state | default(false) == true %}-cloud{% endif %} \
+{% if flightdeck_solr.cloud.zookeepers | length > 0 %}-z {% for _zookeeper in flightdeck_solr.cloud.zookeepers | default([]) %}{{ _zookeeper.url }}:{{ _zookeeper.port | default('2181') }}{% if not loop.last %},{% endif %}{% endfor %}{% endif %} \
   -m {{ flightdeck_solr.memory | default(flightdeck_solr_defaults.memory) }} \
   -p {{ flightdeck_solr.port | default(flightdeck_solr_defaults.port) }} \
-  -h localhost
+{% if flightdeck_solr.host is defined %}-h  {{ flightdeck_solr.host }}{% endif %} \
+  -noprompt
