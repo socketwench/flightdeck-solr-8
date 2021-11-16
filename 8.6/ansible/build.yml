@@ -68,7 +68,7 @@
         state: directory
         owner: "solr"
         group: "solr"
-        mode: "u=rwx,g=rwx,o="
+        mode: "u=rwx,g=rwx,o=rw"
   handlers:
     - name: delete temp items
       file:
