@@ -3,9 +3,14 @@
   tasks:
     - name: Get list of existing cores
       uri:
-        url: "http://localhost:{{ flightdeck_solr.port | default(flightdeck_solr_defaults.port) }}/solr/admin/cores"
+        url: "http://127.0.0.1:{{ flightdeck_solr.port | default(flightdeck_solr_defaults.port) }}/solr/admin/cores"
         return_content: yes
+        status_code:
+          - 200
       register: _current_cores
+      until: _current_cores.status == 200
+      retries: 6
+      delay: 15
 
     - name: Generate a flat list of core names
       set_fact:
