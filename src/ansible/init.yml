@@ -1,0 +1,110 @@
+---
+- hosts: solr
+  tasks:
+    - name: Ensure core directories exist
+      file:
+        path: "/opt/solr/server/solr/{{ item.name }}"
+        state: directory
+        owner: "solr"
+        group: "solr"
+        mode: "u=wrx,g=rwx,o="
+        recurse: true
+      loop: "{{ flightdeck_solr.cores | default([]) }}"
+      loop_control:
+        label: "{{ item.name }}"
+
+    - name: Ensure core data directories exist
+      file:
+        path: "{{ item.dataDir | default('/data/' + item.name) }}"
+        state: directory
+        owner: "solr"
+        group: "solr"
+        mode: "u=wrx,g=rwx,o="
+        recurse: true
+      loop: "{{ flightdeck_solr.cores | default([]) }}"
+      loop_control:
+        label: "{{ item.name }}"
+
+    - name: Sync confDir to /opt/solr/server/solr
+      synchronize:
+        src: "{{ item.confDir }}/"
+        dest: "/opt/solr/server/solr/{{ item.name }}/conf"
+        archive: yes
+        delete: yes
+        owner: no
+        group: no
+        perms: no
+      when:
+        - item.confDir is defined
+      loop: "{{ flightdeck_solr.cores | default([]) }}"
+      loop_control:
+        label: "{{ item.name }}"
+
+    - name: Create directories for core confs provided inline
+      file:
+        path: "/opt/solr/server/solr/{{ item.name }}/conf"
+        state: directory
+        owner: "solr"
+        group: "solr"
+        mode: "u=wrx,g=rwx,o="
+        recurse: true
+      when:
+        - item.conf is defined
+      loop: "{{ flightdeck_solr.cores | default([]) }}"
+      loop_control:
+        label: "{{ item.name }}"
+
+    - name: Write core confs if provided inline
+      copy:
+        content: "\
+          {% if item.1.content_base64 is defined %}\
+          {{ item.1.content_base64 | b64decode }}\
+          {% else %}\
+          {{ item.1.content }}\
+          {% endif %}"
+        dest: "/opt/solr/server/solr/{{ item.0.name }}/conf/{{ item.1.name }}"
+        owner: "solr"
+        group: "solr"
+        mode: "u=wrx,g=rwx,o="
+      when:
+        - item.confDir is not defined
+      loop_control:
+        label: "{{ item.0.name }}"
+      with_subelements:
+        - "{{ flightdeck_solr.cores | default([]) }}"
+        - "conf"
+        - skip_missing: true
+
+    - name: Symlink dataDir to /opt/solr/server/solr
+      file:
+        src: "{{ item.dataDir }}"
+        dest: "/opt/solr/server/solr/{{ item.name }}/data"
+        state: link
+        owner: "solr"
+        group: "solr"
+        mode: "u=wrx,g=rwx,o="
+      when:
+        - item.type | default(false) == 'custom'
+        - item.dataDir is defined
+      loop: "{{ flightdeck_solr.cores | default([]) }}"
+      loop_control:
+        label: "{{ item.name }}"
+
+    - name: Deploy key scripts.
+      template:
+        src: "{{ item.src }}"
+        dest: "{{ item.dest }}"
+        owner: "solr"
+        group: "solr"
+        mode: "u=rwx,g=rwx,o="
+      loop:
+        - src: "templates/solr-foreground.sh.j2"
+          dest: "/opt/solr/bin/solr-foreground.sh"
+
+  handlers:
+    - name: stop local solr
+      shell: >
+        /opt/solr/bin/solr stop -all && pkill java
+      ignore_errors: yes
+      environment:
+        SOLR_PID_DIR: "/home/solr"

@@ -25,9 +25,9 @@
         - delete temp items
     - name: Download solr
       get_url:
-        url: "https://archive.apache.org/dist/lucene/solr/8.6.0/solr-8.6.0.tgz"
+        url: "https://www.apache.org/dyn/closer.lua/lucene/solr/8.11.1/solr-8.11.1.tgz?action=download"
         dest: "{{ _run_temp_dir.path }}/solr.tar.gz"
-        checksum: "sha512:6b0d618069e37215f305d9a61a3e65be2b9cfc32a3689ea6a25be2f220b1ecc96a644ecc31c81e335a2dfa0bc8b7d0f2881ca192c36fd435cdd832fd309a9ddb"
+        checksum: "sha512:4893f836aec84b03d7bfe574e59e305c03b5ede4a48020034fbe81440b8feee79e55fd9ead230e5b89b3f25124e9b56c1ddc4bb5c7f631cf4e846b9cab5f9a45"
         mode: "u=rwx,g=rwx,o="
     - name: Ensure key directories exist
       file:
@@ -68,7 +68,19 @@
         state: directory
         owner: "solr"
         group: "solr"
-        mode: "u=rwx,g=rwx,o=rw"
+        mode: "u=rwx,g=rwx,o="
+    # Deploy the run command at build time using defaults in the template.
+    # This way, the container can still run via FLIGHTDECK_SKIP_ENTRYPOINT.
+    - name: Deploy key scripts.
+      template:
+        src: "{{ item.src }}"
+        dest: "{{ item.dest }}"
+        owner: "solr"
+        group: "solr"
+        mode: "u=rwx,g=rwx,o="
+      loop:
+        - src: "templates/solr-foreground.sh.j2"
+          dest: "/opt/solr/bin/solr-foreground.sh"
   handlers:
     - name: delete temp items
       file:
