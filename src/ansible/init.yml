@@ -25,16 +25,16 @@
       loop_control:
         label: "{{ item.name }}"
 
-    - name: Sync confDir to /opt/solr/server/solr
-      synchronize:
+    - name: Symlink confDir to /opt/solr/server/solr
+      file:
         src: "{{ item.confDir }}/"
         dest: "/opt/solr/server/solr/{{ item.name }}/conf"
-        archive: yes
-        delete: yes
-        owner: no
-        group: no
-        perms: no
+        state: link
+        owner: "solr"
+        group: "solr"
+        mode: "u=wrx,g=rwx,o="
       when:
+        - item.type | default(false) == 'custom'
         - item.confDir is defined
       loop: "{{ flightdeck_solr.cores | default([]) }}"
       loop_control:
