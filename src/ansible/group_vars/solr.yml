@@ -1,5 +1,5 @@
 ---
-flighdeck_motd_name: Solr 6.6
+flighdeck_motd_name: Solr 8
 
 flightdeck_groups:
   - name: "solr"
@@ -14,9 +14,9 @@ flightdeck_user_prompt: '\u@flightdeck-solr-8:\w$ '
 
 flightdeck_motd_links:
   - name: 'Code & docs'
-    url: 'https://github.com/ten7/flightdeck-solr-8'
+    url: 'https://github.com/socketwench/flightdeck-solr-8'
   - name: ' Learn more'
-    url: 'https://flightdeck.ten7.com/'
+    url: 'https://flightdeck.host/'
 
 flightdeck_init_commands: |
   if [ -f "/ansible/init.yml" ]; then
